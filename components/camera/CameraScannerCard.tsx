@@ -2,40 +2,26 @@ import { CameraView } from 'expo-camera';
 import React from 'react';
 import {
   ActivityIndicator,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { GeminiModel } from '@/utils/api';
 
 type CameraScannerCardProps = {
   cameraRef: React.RefObject<CameraView | null>;
   isProcessing: boolean;
-  isLoadingModels: boolean;
-  models: GeminiModel[];
-  selectedModel: string;
-  onSelectedModelChange: (model: string) => void;
+  isCaptureDisabled?: boolean;
+  captureButtonLabel: string;
   onCapture: () => void;
-};
-
-const getModelId = (modelName: string): string => {
-  return modelName.replace(/^models\//, '');
-};
-
-const getModelLabel = (model: GeminiModel): string => {
-  return model.displayName || getModelId(model.name);
 };
 
 export function CameraScannerCard({
   cameraRef,
   isProcessing,
-  isLoadingModels,
-  models,
-  selectedModel,
-  onSelectedModelChange,
+  isCaptureDisabled = false,
+  captureButtonLabel,
   onCapture,
 }: CameraScannerCardProps) {
   return (
@@ -45,58 +31,6 @@ export function CameraScannerCard({
         <ThemedText style={styles.sectionSubtitle}>
           Place text inside the frame and tap capture.
         </ThemedText>
-      </View>
-
-      <View style={styles.modelSelectorCard}>
-        <View style={styles.modelSelectorHeader}>
-          <ThemedText style={styles.modelSelectorTitle}>Gemini Model</ThemedText>
-
-          {isLoadingModels ? (
-            <ActivityIndicator size="small" color="#38BDF8" />
-          ) : null}
-        </View>
-
-        {models.length > 0 ? (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.modelPillRow}
-          >
-            {models.map((model) => {
-              const modelId = getModelId(model.name);
-              const isSelected = selectedModel === modelId;
-
-              return (
-                <TouchableOpacity
-                  key={model.name}
-                  activeOpacity={0.85}
-                  style={[
-                    styles.modelPill,
-                    isSelected && styles.modelPillSelected,
-                  ]}
-                  onPress={() => onSelectedModelChange(modelId)}
-                  disabled={isProcessing}
-                >
-                  <ThemedText
-                    style={[
-                      styles.modelPillText,
-                      isSelected && styles.modelPillTextSelected,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {getModelLabel(model)}
-                  </ThemedText>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        ) : (
-          <ThemedText style={styles.modelFallbackText}>
-            {isLoadingModels
-              ? 'Loading available models...'
-              : `Using ${selectedModel}`}
-          </ThemedText>
-        )}
       </View>
 
       <View style={styles.cameraCard}>
@@ -119,10 +53,11 @@ export function CameraScannerCard({
               activeOpacity={0.85}
               style={[
                 styles.cameraActionButton,
-                isProcessing && styles.cameraActionButtonDisabled,
+                (isProcessing || isCaptureDisabled) &&
+                  styles.cameraActionButtonDisabled,
               ]}
               onPress={onCapture}
-              disabled={isProcessing}
+              disabled={isProcessing || isCaptureDisabled}
             >
               {isProcessing ? (
                 <View style={styles.cameraProcessingRow}>
@@ -133,7 +68,7 @@ export function CameraScannerCard({
                 </View>
               ) : (
                 <ThemedText style={styles.cameraActionButtonText}>
-                  Capture & Translate
+                  {captureButtonLabel}
                 </ThemedText>
               )}
             </TouchableOpacity>
@@ -159,64 +94,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 14,
     color: '#94A3B8',
-  },
-
-  modelSelectorCard: {
-    borderRadius: 20,
-    backgroundColor: '#0F172A',
-    borderWidth: 1,
-    borderColor: '#1E293B',
-    padding: 12,
-    marginBottom: 14,
-  },
-
-  modelSelectorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-
-  modelSelectorTitle: {
-    color: '#F8FAFC',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  modelPillRow: {
-    gap: 8,
-    paddingRight: 4,
-  },
-
-  modelPill: {
-    maxWidth: 220,
-    borderRadius: 999,
-    paddingVertical: 9,
-    paddingHorizontal: 12,
-    backgroundColor: '#111827',
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-
-  modelPillSelected: {
-    backgroundColor: '#38BDF8',
-    borderColor: '#38BDF8',
-  },
-
-  modelPillText: {
-    color: '#CBD5E1',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-
-  modelPillTextSelected: {
-    color: '#082F49',
-  },
-
-  modelFallbackText: {
-    color: '#94A3B8',
-    fontSize: 13,
-    lineHeight: 18,
   },
 
   cameraCard: {

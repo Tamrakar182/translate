@@ -16,6 +16,36 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
+This default workflow keeps Expo Go compatibility for the Gemini and Mock modes.
+
+## AI Modes
+
+- `gemini` is the default mode and works in Expo Go.
+- `mock` is an offline demo mode that works in Expo Go.
+- `litert` uses a local LiteRT-LM model and requires a development build.
+
+To use the local model path, install the native packages and build a dev client:
+
+```bash
+npm install react-native-litert-lm react-native-nitro-modules
+npx expo install expo-dev-client
+npx expo prebuild
+npx expo run:android
+```
+
+The Expo config includes the LiteRT-LM config plugin for the development-build workflow:
+
+```json
+{
+   "expo": {
+      "plugins": ["react-native-litert-lm"],
+      "android": {
+         "minSdkVersion": 26
+      }
+   }
+}
+```
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
