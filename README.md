@@ -1,4 +1,4 @@
-# Camera Translator
+# Translator
 
 An Expo Router app that captures real-world text with the camera, translates it
 to English, and reads the result aloud.
@@ -6,8 +6,8 @@ to English, and reads the result aloud.
 ## Run
 
 ```bash
-npm install
-npm run start:expo-go
+bun install
+bun run start
 ```
 
 Gemini translation works in Expo Go when `EXPO_PUBLIC_GEMINI_KEY` is available
@@ -15,11 +15,10 @@ in the environment.
 
 ## Local Model Mode
 
-The local LiteRT-LM mode requires a development build:
+The local LiteRT-LM mode requires a development build along with android studio setup:
 
 ```bash
-npm run start:litert
-npm run android:litert
+bun run android
 ```
 
 The current app path is intentionally small:
