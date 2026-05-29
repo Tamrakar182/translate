@@ -20,18 +20,11 @@ export function useTranslatedSpeech(translatedText: string) {
     setIsSpeaking(true);
     setIsSpeechPaused(false);
 
-    Speech.speak(translatedText, {
-      language: 'en',
-      pitch: 1,
-      rate: 0.95,
-      onStart: () => {
-        setIsSpeaking(true);
-        setIsSpeechPaused(false);
-      },
-      onDone: resetSpeechState,
-      onStopped: resetSpeechState,
-      onError: resetSpeechState,
-    });
+    Alert.alert(
+      'Workshop TODO',
+      'Live-code Speech.speak(translatedText) here.'
+    );
+    resetSpeechState();
   }, [translatedText, resetSpeechState]);
 
   const pauseSpeech = async (): Promise<void> => {

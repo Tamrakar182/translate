@@ -1,14 +1,10 @@
 import type { CameraView } from 'expo-camera';
-import { useCameraPermissions } from 'expo-camera';
-import Constants from 'expo-constants';
 import * as Speech from 'expo-speech';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert } from 'react-native';
 
-import { LOCAL_MODEL_UNAVAILABLE_MESSAGE } from '@/ai/litert/config';
-import { useLiteRtModel } from '@/ai/litert/use-litert-model';
 import { translateImage } from '@/ai/translator';
-import type { AiMode } from '@/ai/types';
+import type { TranslateImageInput } from '@/ai/types';
 
 type UseImageTranslatorParams = {
   onTranslated: (text: string) => void;
@@ -17,41 +13,19 @@ type UseImageTranslatorParams = {
 export function useImageTranslator({
   onTranslated,
 }: UseImageTranslatorParams) {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [aiMode, setAiMode] = useState<AiMode>('gemini');
   const [isProcessing, setIsProcessing] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
-  const previousModeRef = useRef<AiMode>('gemini');
+  const permission = { granted: false };
 
-  const localModelStatus = useLiteRtModel(aiMode === 'litert');
-  const isExpoGo = Constants.executionEnvironment === 'storeClient';
-  const isCaptureDisabled =
-    aiMode === 'litert' && !localModelStatus.isReady;
-
-  const captureButtonLabel = getCaptureButtonLabel(aiMode, localModelStatus);
-
-  useEffect(() => {
-    if (
-      aiMode === 'litert' &&
-      previousModeRef.current !== 'litert' &&
-      isExpoGo
-    ) {
-      Alert.alert('Local Model Unavailable', LOCAL_MODEL_UNAVAILABLE_MESSAGE);
-    }
-
-    previousModeRef.current = aiMode;
-  }, [aiMode, isExpoGo]);
+  const requestPermission = (): void => {
+    Alert.alert(
+      'Workshop TODO',
+      'Live-code useCameraPermissions() here.'
+    );
+  };
 
   const captureAndTranslate = async (): Promise<void> => {
-    if (!cameraRef.current || localModelStatus.isLoading || isProcessing) {
-      return;
-    }
-
-    if (aiMode === 'litert' && !localModelStatus.isReady) {
-      Alert.alert(
-        'Local Model Unavailable',
-        localModelStatus.error || LOCAL_MODEL_UNAVAILABLE_MESSAGE
-      );
+    if (!cameraRef.current || isProcessing) {
       return;
     }
 
@@ -59,10 +33,7 @@ export function useImageTranslator({
       setIsProcessing(true);
       await Speech.stop();
 
-      const photo = await cameraRef.current.takePictureAsync({
-        base64: true,
-        quality: 0.35,
-      });
+      const photo = await capturePhoto(cameraRef.current);
 
       if (!photo?.uri) {
         Alert.alert(
@@ -72,14 +43,7 @@ export function useImageTranslator({
         return;
       }
 
-      const result = await translateImage({
-        mode: aiMode,
-        input: {
-          uri: photo.uri,
-          base64: photo.base64,
-        },
-        localModel: localModelStatus.getLoadedModel(),
-      });
+      const result = await translateImage(photo);
 
       onTranslated(result.text);
     } catch (error) {
@@ -93,34 +57,18 @@ export function useImageTranslator({
   };
 
   return {
-    aiMode,
     cameraRef,
-    captureButtonLabel,
+    captureButtonLabel: 'Capture & Translate',
     captureAndTranslate,
-    isCaptureDisabled,
+    isCaptureDisabled: false,
     isProcessing,
-    localModelStatus,
     permission,
     requestPermission,
-    setAiMode,
   };
 }
 
-function getCaptureButtonLabel(
-  aiMode: AiMode,
-  localModelStatus: ReturnType<typeof useLiteRtModel>
-): string {
-  if (aiMode !== 'litert') return 'Capture & Translate';
-
-  if (localModelStatus.isLoading) {
-    return `Loading Local Model ${Math.round(
-      localModelStatus.downloadProgress * 100
-    )}%`;
-  }
-
-  if (localModelStatus.error) return 'Local Model Unavailable';
-
-  if (!localModelStatus.isReady) return 'Preparing Local Model';
-
-  return 'Capture & Translate';
+async function capturePhoto(
+  _camera: CameraView
+): Promise<TranslateImageInput> {
+  throw new Error('Workshop TODO: live-code takePictureAsync() here.');
 }

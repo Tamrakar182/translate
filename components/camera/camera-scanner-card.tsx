@@ -1,5 +1,4 @@
 import type { CameraView } from 'expo-camera';
-import { CameraView as ExpoCameraView } from 'expo-camera';
 import type { RefObject } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -17,7 +16,7 @@ type CameraScannerCardProps = {
 };
 
 export function CameraScannerCard({
-  cameraRef,
+  cameraRef: _cameraRef,
   isProcessing,
   isCaptureDisabled,
   captureButtonLabel,
@@ -33,17 +32,24 @@ export function CameraScannerCard({
       </View>
 
       <View style={styles.cameraCard}>
-        <ExpoCameraView ref={cameraRef} style={styles.camera} facing="back">
-          <View style={styles.cameraOverlay}>
-            <ScanFrame />
-            <CaptureButton
-              isProcessing={isProcessing}
-              isDisabled={isCaptureDisabled}
-              label={captureButtonLabel}
-              onPress={onCapture}
-            />
-          </View>
-        </ExpoCameraView>
+        <View style={styles.cameraPlaceholder}>
+          <AppText style={styles.placeholderTitle}>
+            Workshop TODO
+          </AppText>
+          <AppText style={styles.placeholderText}>
+            Live-code the CameraView here.
+          </AppText>
+        </View>
+
+        <View style={styles.cameraOverlay}>
+          <ScanFrame />
+          <CaptureButton
+            isProcessing={isProcessing}
+            isDisabled={isCaptureDisabled}
+            label={captureButtonLabel}
+            onPress={onCapture}
+          />
+        </View>
       </View>
     </>
   );
@@ -72,8 +78,22 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     backgroundColor: '#020617',
   },
-  camera: {
-    flex: 1,
+  cameraPlaceholder: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  placeholderTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  placeholderText: {
+    marginTop: 8,
+    color: colors.textSubtle,
+    fontSize: 14,
+    textAlign: 'center',
   },
   cameraOverlay: {
     flex: 1,

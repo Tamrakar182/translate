@@ -1,23 +1,19 @@
-import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { LOCAL_MODEL_UNAVAILABLE_MESSAGE } from '@/ai/litert/config';
 import { CameraPermissionCard } from '@/components/camera/camera-permission-card';
 import { CameraScannerCard } from '@/components/camera/camera-scanner-card';
-import { TranslationEngineCard } from '@/components/translation/translation-engine-card';
 import { CenteredLoader } from '@/components/ui/centered-loader';
 import { colors } from '@/constants/colors';
 import { useImageTranslator } from '@/hooks/use-image-translator';
 
 export default function HomeScreen() {
-  const router = useRouter();
   const translator = useImageTranslator({
     onTranslated: (text) => {
-      router.push({
-        pathname: '/translated',
-        params: { text },
-      });
+      Alert.alert(
+        'Workshop TODO',
+        `Navigate to /translated with this text:\n\n${text}`
+      );
     },
   });
 
@@ -42,13 +38,6 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
-        <TranslationEngineCard
-          mode={translator.aiMode}
-          localModelStatus={translator.localModelStatus}
-          localModelUnavailableMessage={LOCAL_MODEL_UNAVAILABLE_MESSAGE}
-          onModeChange={translator.setAiMode}
-        />
-
         <CameraScannerCard
           cameraRef={translator.cameraRef}
           isProcessing={translator.isProcessing}
