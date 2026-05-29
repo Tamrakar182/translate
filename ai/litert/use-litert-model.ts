@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { LOCAL_MODEL_UNAVAILABLE_MESSAGE } from '@/ai/litert/config';
 import { createLiteRtModel } from '@/ai/litert/model-loader';
 import {
-    getLiteRtErrorMessage,
-    isExpoGo,
-    type LiteRtModelHandle,
+  getLiteRtErrorMessage,
+  isExpoGo,
+  isLiteRtModelReady,
+  type LiteRtModelHandle,
 } from '@/ai/litert/native-module';
 
 export type LiteRtModelState = {
@@ -14,9 +15,12 @@ export type LiteRtModelState = {
   isLoading: boolean;
   downloadProgress: number;
   error: string | null;
+  getLoadedModel: () => LiteRtModelHandle | null;
 };
 
-const initialModelState: LiteRtModelState = {
+type LiteRtModelSnapshot = Omit<LiteRtModelState, 'getLoadedModel'>;
+
+const initialModelState: LiteRtModelSnapshot = {
   localModel: null,
   isReady: false,
   isLoading: false,
@@ -25,9 +29,13 @@ const initialModelState: LiteRtModelState = {
 };
 
 export function useLiteRtModel(isEnabled: boolean): LiteRtModelState {
-  const [state, setState] = useState<LiteRtModelState>(initialModelState);
+  const [state, setState] = useState<LiteRtModelSnapshot>(initialModelState);
   const modelRef = useRef<LiteRtModelHandle | null>(null);
   const activeRequestId = useRef(0);
+
+  const getLoadedModel = (): LiteRtModelHandle | null => {
+    return isLiteRtModelReady(modelRef.current) ? modelRef.current : null;
+  };
 
   useEffect(() => {
     activeRequestId.current += 1;
@@ -82,7 +90,7 @@ export function useLiteRtModel(isEnabled: boolean): LiteRtModelState {
         modelRef.current = model;
         setState({
           localModel: model,
-          isReady: true,
+          isReady: isLiteRtModelReady(model),
           isLoading: false,
           downloadProgress: 1,
           error: null,
@@ -105,5 +113,12 @@ export function useLiteRtModel(isEnabled: boolean): LiteRtModelState {
     };
   }, [isEnabled]);
 
-  return state;
+  const loadedModel = getLoadedModel();
+
+  return {
+    ...state,
+    localModel: loadedModel,
+    isReady: state.isReady && loadedModel !== null,
+    getLoadedModel,
+  };
 }

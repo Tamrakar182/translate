@@ -7,6 +7,7 @@ type LiteRtModule = typeof import('react-native-litert-lm');
 
 export type LiteRtModelHandle = {
   sendMessageWithImage: (prompt: string, imagePath: string) => Promise<string>;
+  isReady?: () => boolean;
   close?: () => void;
 };
 
@@ -21,6 +22,13 @@ export function isLiteRtModelHandle(
     typeof model === 'object' &&
     model !== null &&
     typeof (model as LiteRtModelHandle).sendMessageWithImage === 'function'
+  );
+}
+
+export function isLiteRtModelReady(model: unknown): model is LiteRtModelHandle {
+  return (
+    isLiteRtModelHandle(model) &&
+    (typeof model.isReady !== 'function' || model.isReady())
   );
 }
 

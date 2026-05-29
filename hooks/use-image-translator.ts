@@ -78,7 +78,7 @@ export function useImageTranslator({
           uri: photo.uri,
           base64: photo.base64,
         },
-        localModel: localModelStatus.localModel,
+        localModel: localModelStatus.getLoadedModel(),
       });
 
       onTranslated(result.text);
