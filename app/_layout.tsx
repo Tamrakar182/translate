@@ -1,9 +1,10 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack } from 'expo-router/stack';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { colors } from '@/constants/colors';
 
 export const unstable_settings = {
   anchor: 'index',
@@ -17,14 +18,14 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#07111F',
+            backgroundColor: colors.background,
           },
-          headerTintColor: '#F8FAFC',
+          headerTintColor: colors.text,
           headerTitleStyle: {
             fontWeight: '800',
           },
           contentStyle: {
-            backgroundColor: '#07111F',
+            backgroundColor: colors.background,
           },
         }}
       >

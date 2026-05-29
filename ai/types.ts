@@ -10,3 +10,7 @@ export type TranslateImageResult = {
   engine: AiMode;
   warning?: string;
 };
+
+export type ImageTranslator = (
+  input: TranslateImageInput
+) => Promise<TranslateImageResult>;
